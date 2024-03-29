@@ -4,25 +4,23 @@ import random
 
 # pygame setup
 pygame.init()
-screen_width = 1280
-screen_height = 720
-screen = pygame.display.set_mode((screen_width, screen_height))
+square_width = 1280
+pixel_width = 50
+screen = pygame.display.set_mode([square_width] * 2)
 clock = pygame.time.Clock()
 running = True
 
 
 def generate_starting_position():
-    position_range = (pixel_width // 2, screen_width - pixel_width // 2, pixel_width)
+    position_range = (pixel_width // 2, square_width - pixel_width // 2, pixel_width)
     return [random.randrange(*position_range), random.randrange(*position_range)]
 
-
-# playground
-pixel_width = 50
 
 # snake
 snake_pixel = pygame.rect.Rect([0, 0, pixel_width - 2, pixel_width - 2])
 snake_pixel.center = generate_starting_position()
 snake = [snake_pixel.copy()]
+snake_direction = (0, 0)
 
 # food (target)
 target = pygame.rect.Rect([0, 0, pixel_width - 2, pixel_width - 2])
@@ -39,6 +37,20 @@ while running:
     screen.fill("black")
 
     # RENDER YOUR GAME HERE
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_w]:
+        snake_direction = (0, - pixel_width)
+    if keys[pygame.K_s]:
+        snake_direction = (0, pixel_width)
+    if keys[pygame.K_a]:
+        snake_direction = (- pixel_width, 0)
+    if keys[pygame.K_d]:
+        snake_direction = (pixel_width, 0)
+
+    snake_pixel.move_ip(snake_direction)
+    snake.append(snake_pixel.copy())
+    snake = snake[-1:]
+
     for snake_part in snake:
         pygame.draw.rect(screen, "green", snake_part)
 
@@ -47,6 +59,6 @@ while running:
     # flip() the display to put your work on screen
     pygame.display.flip()
 
-    clock.tick(60)  # limits FPS to 60
+    clock.tick(10)
 
 pygame.quit()
